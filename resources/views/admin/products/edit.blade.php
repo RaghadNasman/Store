@@ -23,14 +23,20 @@
         </div>
         <div class="mb-3">
             <label for="description" class="form-label">اختر الصنف</label>
+            {{-- <label for="description" class="form-label">{{$categoryName->id}}</label> --}}
             <select class="form-select" id="category" name="category" aria-label="Default select example">
-                <option value="{{$categoryName->id}}">{{$categoryName->name}}</option>
+                {{-- <option value="{{$categoryName->id}}">{{$categoryName->name}}</option>
                 @foreach ($categories as $category )
                 @if ($categoryName->name != $category->name){
                     <option value="{{$category->id}}" {{ $product->category == 1 ? 'selected' : '' }}>{{$category->name}}</option>
                 }
                 @endif
-                @endforeach
+                @endforeach --}}
+                @foreach ($categories as $category)
+                <option value="{{ $category->id }}" {{ $product->category == $category->id ? 'selected' : '' }}>
+                    {{ $category->name }}
+                </option>
+            @endforeach
                 {{-- <option value="" disabled {{ is_null($product->category) ? 'selected' : '' }}>اختر الصنف</option>
                 <option value="1" {{ $product->category == 1 ? 'selected' : '' }}>ملابس</option>
                 <option value="2" {{ $product->category == 2 ? 'selected' : '' }}>احذية</option>

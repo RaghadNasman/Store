@@ -14,11 +14,13 @@
           </tr>
         </thead>
         <tbody>
-            @foreach ($products as $product )
+            @foreach ($products as $key => $product )
             <tr>
-              <th scope="row">1</th>
+              <th scope="row">{{++$key}}</th>
               <td>{{$product->name}}</td>
               <td>{{$categories[$product->category]?? 'غير محدد'}}</td>
+              {{-- <td>{{$product->category->name}}</td> --}}
+              {{-- <td>{{ optional($product->category)->name ?? "لا يوجد تصنيف" }}</td> --}}
               <td>{{$product->price}}</td>
               <td>{{$product->quantity}}</td>
               <td>
@@ -32,5 +34,6 @@
 
         </tbody>
       </table>
+      {{$products->links()}}
 </div>
 @endsection

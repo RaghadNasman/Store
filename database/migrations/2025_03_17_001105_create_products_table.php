@@ -18,7 +18,9 @@ return new class extends Migration
             $table->string('quantity');
             $table->string('price');
             $table->string('description');
-            $table->string('category');
+            $table->bigInteger('category')->unsigned();
+            $table->foreign('category')->references('id')->on('categories');
+           
         });
     }
 

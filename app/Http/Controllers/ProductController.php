@@ -5,25 +5,37 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function index()
     {
-        $products = Product::all();
-        $categories = Category::pluck('name', 'id'); // مصفوفة [id => name]
-
-        return view('admin.products.index', compact('products', 'categories'));
+        // $products = Product::all();
+        // $categories = Category::where('user_id', Auth::id())->get();
+        $categories = Category::where('user_id', Auth::id())
+        ->pluck('name', 'id'); // مصفوفة [id => name]
+        $products = Product::where('user_id', Auth::id())
+        ->with(['category', 'user'])
+        ->latest()
+        ->paginate(3);
+        return view('admin.products.index', compact('products','categories'));
     }
     public function createProduct()
     {
-        $categories = Category::all();
+        // $categories = Category::all();
+        $categories = Category::where('user_id', Auth::id())->get();
         return view('admin.products.create', compact('categories'));
     }
     public function storeProduct(Request $request)
     {
         $product  = new Product;
         $product->name = $request->name;
+        $product->user_id = Auth::id();
         $product->quantity = $request->quantity;
         $product->price = $request->price;
         $product->category = $request->category;
@@ -33,16 +45,21 @@ class ProductController extends Controller
     }
     public function editProduct($id)
     {
-        $product = Product::find($id);
+        // $product = Product::find($id);
+        $product = Product::findOrFail($id);
+        // $categories = Category::all();
+        $categories = Category::where('user_id', Auth::id())->get();
         $catID = $product->category;
-        $categoryName = Category::find($catID);
-        $categories = Category::all();
+        $categoryName = Category::findOrFail($catID);
+        $this->authorize('update', $product);
+        // return view('admin.products.edit', compact('product', 'categories'));
         return view('admin.products.edit', compact('product', 'categories', 'categoryName'));
     }
     public function updateProduct(Request $request, $id)
     {
-        $product = Product::find($id);
+        $product = Product::findOrFail($id);
         $product->name = $request->name;
+        $this->authorize('update', $product);
         $product->quantity = $request->quantity;
         $product->price = $request->price;
         $product->category = $request->category;
@@ -52,7 +69,10 @@ class ProductController extends Controller
     }
     public function destroyProduct($id)
     {
-        Product::find($id)->delete();
+        // Product::find($id)->delete();
+        $product = Product::findOrFail($id);
+        $this->authorize('delete', $product);
+        $product->delete();
         return redirect()->back();
     }
 
